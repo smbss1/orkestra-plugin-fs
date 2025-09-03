@@ -4,6 +4,8 @@ name: Release Orkestra Plugin
 # Déclencheur du workflow
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*' # Se déclenche uniquement sur la création de tags comme v1.0.0, v1.2.3, etc.
 
