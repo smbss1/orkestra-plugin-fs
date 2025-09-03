@@ -38,7 +38,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21' # Assurez-vous que cela correspond à votre version de Go
+          go-version: '1.24.5' # Assurez-vous que cela correspond à votre version de Go
 
       # Étape 3 : Définir les noms de fichiers pour la compilation et l'archivage
       - name: Set output file and archive names
@@ -81,7 +81,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-archives
+          name: plugin-archives-${{ env.ARCHIVE_NAME }}
           path: ${{ env.ARCHIVE_NAME }}
 
   # Job pour créer la Release sur GitHub une fois que tous les builds sont terminés
@@ -99,7 +99,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: plugin-archives
+          name: plugin-archives-${{ env.ARCHIVE_NAME }}
           path: archives
 
       # Étape 2 : Créer la Release et y attacher toutes les archives téléchargées
