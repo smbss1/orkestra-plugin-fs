@@ -95,6 +95,20 @@ jobs:
     permissions:
       # Permission nécessaire pour que l'action puisse créer une Release
       contents: write
+    strategy:
+      matrix:
+        # Définit les combinaisons de système d'exploitation (goos) et d'architecture (goarch)
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: windows
+            goarch: amd64
+          - goos: darwin # darwin est le nom interne pour macOS
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
 
     steps:
       # Étape 1 : Télécharger tous les artefacts (les archives .zip) créés par le job "build"
