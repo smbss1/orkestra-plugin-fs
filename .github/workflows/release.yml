@@ -111,6 +111,29 @@ jobs:
             goarch: arm64
 
     steps:
+      - name: Set output file and archive names
+        id: set_names
+        shell: bash
+        run: |
+          # Le nom du plugin, sans le préfixe "orkestra-plugin-"
+          PLUGIN_NAME="fs"
+          
+          # Le nom complet de l'exécutable
+          EXECUTABLE_BASE="orkestra-plugin-${PLUGIN_NAME}"
+          EXECUTABLE_NAME="${EXECUTABLE_BASE}"
+          
+          # Ajoute l'extension .exe pour Windows
+          if [ "${{ matrix.goos }}" == "windows" ]; then
+            EXECUTABLE_NAME="${EXECUTABLE_BASE}.exe"
+          fi
+          
+          # Le nom final de l'archive .zip, respectant la convention
+          ARCHIVE_NAME="${EXECUTABLE_BASE}_${{ matrix.goos }}_${{ matrix.goarch }}.zip"
+
+          # Expose ces variables pour les étapes suivantes
+          echo "EXECUTABLE_NAME=${EXECUTABLE_NAME}" >> $GITHUB_ENV
+          echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> $GITHUB_ENV
+
       # Étape 1 : Télécharger tous les artefacts (les archives .zip) créés par le job "build"
       - name: Download all artifacts
         uses: actions/download-artifact@v4
