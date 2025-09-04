@@ -6,8 +6,7 @@ on:
       - "v*"
 
 env:
-  # TODO: Remplacez "template" par le nom de votre plugin (ex: "discord", "aws", "fs")
-  PLUGIN_NAME: "template"
+  PLUGIN_NAME: "fs"
 
 jobs:
   lint-test:
@@ -20,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.24.5'
           cache: true
 
       - name: Vet

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"orkestra-plugin-fs/shared"
+	"github.com/smbss1/orkestra-plugin-fs/shared"
 
 	"github.com/hashicorp/go-plugin"
 )

@@ -1,4 +1,4 @@
-module orkestra-plugin-fs
+module github.com/smbss1/orkestra-plugin-fs
 
 go 1.24.5
 
