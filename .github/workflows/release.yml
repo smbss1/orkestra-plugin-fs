@@ -1,9 +1,9 @@
-name: Release (Tag-Based)
+name: Release Orkestra Plugin
+
 on:
   push:
     tags:
       - "v*"
-      - "latest"
 
 env:
   # TODO: Remplacez "template" par le nom de votre plugin (ex: "discord", "aws", "fs")
@@ -26,6 +26,7 @@ jobs:
             goarch: amd64
           - goos: darwin
             goarch: arm64
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,11 +40,7 @@ jobs:
         id: set_names
         shell: bash
         run: |
-          # Le nom du plugin, sans le préfixe "orkestra-plugin-"
-          PLUGIN_NAME="fs"
-          
-          # Le nom complet de l'exécutable
-          EXECUTABLE_BASE="orkestra-plugin-${PLUGIN_NAME}"
+          EXECUTABLE_BASE="orkestra-plugin-${{ env.PLUGIN_NAME }}"
           EXECUTABLE_NAME="${EXECUTABLE_BASE}"
           
           # Ajoute l'extension .exe pour Windows
