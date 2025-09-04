@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - "v*"
+      - "latest"
+
 jobs:
   build:
     name: Build Plugin for ${{ matrix.goos }}/${{ matrix.goarch }}
