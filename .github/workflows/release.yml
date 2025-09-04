@@ -10,8 +10,28 @@ env:
   PLUGIN_NAME: "template"
 
 jobs:
+  lint-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -v ./...
+
   build:
     name: Build Plugin for ${{ matrix.goos }}/${{ matrix.goarch }}
+    needs: lint-test
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,33 +62,33 @@ jobs:
         run: |
           EXECUTABLE_BASE="orkestra-plugin-${{ env.PLUGIN_NAME }}"
           EXECUTABLE_NAME="${EXECUTABLE_BASE}"
-          
-          # Ajoute l'extension .exe pour Windows
           if [ "${{ matrix.goos }}" == "windows" ]; then
             EXECUTABLE_NAME="${EXECUTABLE_BASE}.exe"
           fi
-          
-          # Le nom final de l'archive .zip, respectant la convention
-          ARCHIVE_NAME="${{ matrix.goos }}_${{ matrix.goarch }}.zip"
 
-          # Expose ces variables pour les étapes suivantes
+          ARCHIVE_NAME="${EXECUTABLE_BASE}_${{ matrix.goos }}_${{ matrix.goarch }}.zip"
           echo "EXECUTABLE_NAME=${EXECUTABLE_NAME}" >> $GITHUB_ENV
           echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> $GITHUB_ENV
-
+      
       - name: Build plugin
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
-        run: go build -o ${{ env.EXECUTABLE_NAME }} .
+        run: go build -ldflags="-s -w" -o ${{ env.EXECUTABLE_NAME }} .
 
       - name: Archive plugin
         run: zip ${{ env.ARCHIVE_NAME }} ${{ env.EXECUTABLE_NAME }}
+
+      - name: Generate checksum
+        run: sha256sum ${{ env.ARCHIVE_NAME }} > ${{ env.ARCHIVE_NAME }}.sha256
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: plugin-archive-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: ${{ env.ARCHIVE_NAME }}
+          path: |
+            ${{ env.ARCHIVE_NAME }}
+            ${{ env.ARCHIVE_NAME }}.sha256
 
   release:
     name: Create GitHub Release
@@ -80,10 +100,12 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: archives
 
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v2
         with:
-          files: plugin-archive-*/*
-          body: "Automated release of ${{ github.ref_name }}."
-          make_latest: 'true'
+          generate_release_notes: true
+          files: archives/*/*
+
