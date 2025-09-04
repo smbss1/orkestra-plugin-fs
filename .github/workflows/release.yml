@@ -5,6 +5,10 @@ on:
       - "v*"
       - "latest"
 
+env:
+  # TODO: Remplacez "template" par le nom de votre plugin (ex: "discord", "aws", "fs")
+  PLUGIN_NAME: "template"
+
 jobs:
   build:
     name: Build Plugin for ${{ matrix.goos }}/${{ matrix.goarch }}
@@ -23,9 +27,10 @@ jobs:
           - goos: darwin
             goarch: arm64
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set up Go (or replace with your language runtime)
+
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.24.5'
@@ -53,7 +58,7 @@ jobs:
           echo "EXECUTABLE_NAME=${EXECUTABLE_NAME}" >> $GITHUB_ENV
           echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> $GITHUB_ENV
 
-      - name: Build Binary
+      - name: Build plugin
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
@@ -76,14 +81,14 @@ jobs:
       contents: write
 
     steps:
-      - name: Download Artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          name: plugin-archives-*
+          path: archives
 
-      - name: Create GitHub Release
+      - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v2
         with:
-          files: plugin-archive-*/*
-          tag_name: ${{ github.ref_name }}
+          files: archives/*
           body: "Automated release of ${{ github.ref_name }}."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
