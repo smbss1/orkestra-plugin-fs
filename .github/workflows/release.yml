@@ -89,3 +89,4 @@ jobs:
         with:
           files: plugin-archive-*/*
           body: "Automated release of ${{ github.ref_name }}."
+          make_latest: 'true'
